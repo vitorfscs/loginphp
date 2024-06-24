@@ -91,6 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         color: white;
         border-radius: 30px;
         margin-top: 15%;
+        border: 1px solid gold;
     }
 
     #prince form button{
