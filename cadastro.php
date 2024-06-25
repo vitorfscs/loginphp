@@ -4,20 +4,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $login = $_POST["login"] ?? null;
     $senha = $_POST["senha"] ?? null;
+    $nome = $_POST["nome"] ?? null;
+    $celular = $_POST["celular"] ?? null;
 
-    if ($login == "" || $login == null) {
+    if (empty($login)) {
         echo "<script language='javascript' type='text/javascript'>
         alert('O campo login deve ser preenchido');window.location.href='index.php';</script>";
         exit();
     }
 
-    $connect = new mysqli("localhost", "admin", "Joao@Vitor123", "usuarios_banco");
+    $connect = new mysqli("localhost", "admin", "Joao@Vitor123", "usuario_banco");
 
     if ($connect->connect_error) {
         die("Connection failed: " . $connect->connect_error);
     }
 
-    // Check if the login already exists
     $query_select = $connect->prepare("SELECT login FROM login WHERE login = ?");
     if ($query_select === false) {
         die("Prepare failed: " . $connect->error);
@@ -28,28 +29,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result->num_rows > 0) {
         echo "<script language='javascript' type='text/javascript'>
-        alert('Esse login já existe');window.location.href='index.php';</script>";
+        alert('Esse login já existe');window.location.href='index.html';</script>";
         exit();
     } else {
-        // Insert the new user
-        $query_insert = $connect->prepare("INSERT INTO login (login, senha) VALUES (?, ?)");
+        $senha_hashed = password_hash($senha, PASSWORD_DEFAULT);
+        $query_insert = $connect->prepare("INSERT INTO login (login, senha, nome, celular) VALUES (?, ?, ?, ?)");
         if ($query_insert === false) {
             die("Prepare failed: " . $connect->error);
         }
-        $query_insert->bind_param("ss", $login, $senha);
+        $query_insert->bind_param("ssss", $login, $senha_hashed, $nome, $celular);
 
         if ($query_insert->execute()) {
             echo "<script language='javascript' type='text/javascript'>
             alert('Usuário cadastrado com sucesso!');window.location.href='login.html'</script>";
         } else {
             echo "<script language='javascript' type='text/javascript'>
-            alert('Não foi possível cadastrar esse usuário');window.location.href='index.php'</script>";
+            alert('Não foi possível cadastrar esse usuário');window.location.href='index.html'</script>";
         }
     }
 
     $connect->close();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -82,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     #prince{
         width: 450px;
-        height: 300px;
+        height: 360px;
         background-color:black;
         display: flex;
         justify-content: center;
@@ -95,11 +97,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     #prince form button{
-        width: 180px;
+        width: 190px;
         height: 30px;
         border-radius: 30px;
         margin-left: 3px;
         margin-top: 10px;
+        margin-left: 10px;
     }
 
     #prince form input{
@@ -109,6 +112,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         align-items: center;
         justify-content: center;
         text-align:center;
+        margin-left: 10px;
+    }
+
+    #prince form label{
+        text-align: center;
+        margin-left: 85px;
     }
 
     #prince h2{
@@ -130,8 +139,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div id="prince">
         <form method="POST" action="">
         <h2>CADASTRO DE USUARIO</h2>
-            <label>Login:</label><br><input type="text" name="login" id="login" placeholder="Digite seu usuario para criar"required><br>
-            <label>Senha:</label><br><input type="password" name="senha" id="senha" placeholder="Digite sua senha para criar"required><br>
+            <label>Login:</label><br><input type="text" name="login" id="login" placeholder="Digite seu usuario para para criar uma conta"required><br>
+            <label>Senha:</label><br><input type="password" name="senha" id="senha" placeholder="Digite sua senha para para criar uma conta"required><br>
+            <label>Nome:</label><br><input type="text" name="nome" id="nome" placeholder="Digite seu nome completo para criar uma conta"required><br>
+            <label>Celular:</label><br><input type="tel" name="celular" id="celular" placeholder="Digite seu celular com ddd para para criar uma conta"required><br>
             <button type="submit">Cadastrar</button>
         </form>
     </div>

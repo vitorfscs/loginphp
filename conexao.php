@@ -2,7 +2,7 @@
 $host = 'localhost';
 $usuario =  'admin';
 $senha = 'Joao@Vitor123';
-$banco = 'usuarios_banco';
+$banco = 'usuario_banco';
 
 
 $mysqli = new mysqli($host, $usuario, $senha, $banco);
